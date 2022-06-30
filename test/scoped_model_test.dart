@@ -37,9 +37,9 @@ void main() {
         model: counterModel,
         child: MaterialApp(
           home: ScopedBuilder<CounterModel>(
-            builder: ((context, model, child) {
+            builder: (context, model, child) {
               return Text('${model.counter}');
-            }),
+            },
           ),
         ),
       ),
