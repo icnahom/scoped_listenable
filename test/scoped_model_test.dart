@@ -20,8 +20,8 @@ void main() {
     await tester.pumpWidget(
       ScopedContainer(
         container: [
-          (_, child) => ScopedModel(model: counterModel, child: child),
-          (_, child) => ScopedModel(model: settingsModel, child: child),
+          ScopedModel.builder(counterModel),
+          ScopedModel.builder(settingsModel),
         ],
         child: const Placeholder(),
       ),
@@ -60,11 +60,4 @@ class CounterModel extends ChangeNotifier {
   }
 }
 
-class SettingsModel extends ChangeNotifier {
-  bool isDarkTheme = false;
-
-  void toggleTheme() {
-    isDarkTheme = !isDarkTheme;
-    notifyListeners();
-  }
-}
+class SettingsModel extends ChangeNotifier {}

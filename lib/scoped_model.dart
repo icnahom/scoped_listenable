@@ -12,11 +12,18 @@ class ScopedModel<T extends Listenable> extends InheritedNotifier<T> {
     final scopedModel = rebuildOnChange
         ? context.dependOnInheritedWidgetOfExactType<ScopedModel<T>>()
         : context.getElementForInheritedWidgetOfExactType<ScopedModel<T>>()?.widget
-            as ScopedModel<T>;
+            as ScopedModel<T>?;
     if (scopedModel == null) {
       throw ScopedError<T>();
     }
     return scopedModel.notifier!;
+  }
+
+  /// Returns a [ScopedModelBuilder] to be used in a [ScopedContainer].
+  static ScopedModelBuilder builder<T extends Listenable>(T model, {Key? key}) {
+    return (BuildContext context, Widget child) {
+      return ScopedModel<T>(key: key, model: model, child: child);
+    };
   }
 }
 
@@ -75,7 +82,7 @@ class ScopedError<T> extends Error {
       To fix, please:
                 
         * Provide type to ScopedBuilder<MyModel> 
-        * Provide ScopedModel<MyModel> above Navigator         
+        * Provide ScopedModel<MyModel> above MaterialApp or Navigator         
         
       If none of these solutions work, please file a bug at:
       https://github.com/icnahom/scoped_model/issues/new

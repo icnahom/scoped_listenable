@@ -54,14 +54,8 @@ To add multiple ScopedModels, use ScopedContainer.
 ```dart
 ScopedContainer(
   container: [
-    (_, child) => ScopedModel<CounterModel>(
-          model: counterModel,
-          child: child,
-        ),
-    (_, child) => ScopedModel<SettingsModel>(
-          model: settingsModel,
-          child: child,
-        ),
+    ScopedModel.builder(counterModel),
+    ScopedModel.builder(settingsModel),
   ],
   child: MyApp(),
 );
