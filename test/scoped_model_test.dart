@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 void main() {
-  testWidgets('Provides a Listenable model to decendant widgets', (tester) async {
+  testWidgets('Provides a Listenable model to decendant widgets',
+      (tester) async {
     final counterModel = CounterModel();
     await tester.pumpWidget(
       ScopedModel(
@@ -14,14 +15,15 @@ void main() {
     expect(find.byType(ScopedModel<CounterModel>), findsOneWidget);
   });
 
-  testWidgets('Provides all the ScopedModels to decendant widgets', (tester) async {
+  testWidgets('Provides all the ScopedModels to decendant widgets',
+      (tester) async {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
       ScopedContainer(
         container: [
-          ScopedModel.builder(counterModel),
-          ScopedModel.builder(settingsModel),
+          ScopedModel.from(counterModel),
+          ScopedModel.from(settingsModel),
         ],
         child: const Placeholder(),
       ),
@@ -30,7 +32,8 @@ void main() {
     expect(find.byType(ScopedModel<SettingsModel>), findsOneWidget);
   });
 
-  testWidgets('Builds itself whenever Listenable of type T changes', (tester) async {
+  testWidgets('Builds itself whenever Listenable of type T changes',
+      (tester) async {
     final counterModel = CounterModel();
     await tester.pumpWidget(
       ScopedModel(

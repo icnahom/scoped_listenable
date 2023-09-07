@@ -8,19 +8,21 @@ class ScopedModel<T extends Listenable> extends InheritedNotifier<T> {
       : super(notifier: model);
 
   /// Returns a [Listenable], or throws an error.
-  static T of<T extends Listenable>(BuildContext context, {bool rebuildOnChange = true}) {
+  static T of<T extends Listenable>(BuildContext context,
+      {bool rebuildOnChange = true}) {
     final scopedModel = rebuildOnChange
         ? context.dependOnInheritedWidgetOfExactType<ScopedModel<T>>()
-        : context.getElementForInheritedWidgetOfExactType<ScopedModel<T>>()?.widget
-            as ScopedModel<T>?;
+        : context
+            .getElementForInheritedWidgetOfExactType<ScopedModel<T>>()
+            ?.widget as ScopedModel<T>?;
     if (scopedModel == null) {
       throw ScopedError<T>();
     }
     return scopedModel.notifier!;
   }
 
-  /// Returns a [ScopedModelBuilder] to be used in a [ScopedContainer].
-  static ScopedModelBuilder builder<T extends Listenable>(T model, {Key? key}) {
+  /// Returns a [ScopedModelFactory] closure to be used in [ScopedContainer].
+  static ScopedModelFactory from<T extends Listenable>(T model, {Key? key}) {
     return (BuildContext context, Widget child) {
       return ScopedModel<T>(key: key, model: model, child: child);
     };
@@ -41,23 +43,25 @@ class ScopedBuilder<T extends Listenable> extends StatelessWidget {
 
 /// Provides all the [ScopedModel]s to decendant widgets.
 class ScopedContainer extends StatelessWidget {
-  const ScopedContainer({super.key, required this.container, required this.child});
-  final List<ScopedModelBuilder> container;
+  const ScopedContainer(
+      {super.key, required this.container, required this.child});
+  final List<ScopedModelFactory> container;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     Widget currentChild = child;
-    for (final scopedModelBuilder in container) {
-      currentChild = scopedModelBuilder(context, currentChild);
+    for (final scopedModelFactory in container) {
+      currentChild = scopedModelFactory(context, currentChild);
       assert(currentChild is ScopedModel);
     }
     return currentChild;
   }
 }
 
-/// Function that returns a [ScopedModel] widget.
-typedef ScopedModelBuilder = Widget Function(BuildContext context, Widget child);
+/// Closure that creates and returns a [ScopedModel] widget.
+typedef ScopedModelFactory = Widget Function(
+    BuildContext context, Widget child);
 
 /// Methods for calling [ScopedModel.of] on [BuildContext].
 extension ScopedContext on BuildContext {
