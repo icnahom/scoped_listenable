@@ -64,9 +64,12 @@ ScopedContainer(
 To obtain Listenable directly, use extension methods. 
 
 ```dart
-context.find<CounterModel>();
+void initState() {
+  context.get<CounterModel>().reset();
 
-context.dependOn<CounterModel>();
+  
+Widget build(BuildContext context) {
+  final countModel = context.observe<CounterModel>();
 ```
 
 ## Additional information
