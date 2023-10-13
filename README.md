@@ -69,7 +69,7 @@ void initState() {
 
   
 Widget build(BuildContext context) {
-  final countModel = context.observe<CounterModel>();
+  final counterModel = context.observe<CounterModel>();
 ```
 
 ## Additional information
