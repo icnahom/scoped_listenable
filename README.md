@@ -23,7 +23,7 @@ scoped_model:
 
 Import package: 
 ```dart 
-import 'package:icnahom/scoped_model.dart'; 
+import 'package:scoped_model/scoped_model.dart'; 
 ```
 
 ## Usage
@@ -66,8 +66,8 @@ To obtain Listenable directly, use extension methods.
 ```dart
 void initState() {
   context.get<CounterModel>().reset();
-
-  
+```
+```dart
 Widget build(BuildContext context) {
   final counterModel = context.observe<CounterModel>();
 ```
