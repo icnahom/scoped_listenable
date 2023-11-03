@@ -66,12 +66,12 @@ typedef ScopedModelFactory = Widget Function(
 /// Methods for calling [ScopedModel.of] on [BuildContext].
 extension ScopedContext on BuildContext {
   /// Returns a [Listenable] without rebuilding on change.
-  T get<T extends Listenable>() {
+  T find<T extends Listenable>() {
     return ScopedModel.of<T>(this, rebuildOnChange: false);
   }
 
   /// Returns a [Listenable] and rebuilds on change.
-  T observe<T extends Listenable>() {
+  T dependOn<T extends Listenable>() {
     return ScopedModel.of<T>(this);
   }
 }
