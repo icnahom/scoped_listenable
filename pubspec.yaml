@@ -1,7 +1,7 @@
 name: scoped_listenable
 description: Provides a Listenable to descendant widgets.
 version: 1.0.0
-homepage:
+homepage: https://github.com/icnahom/scoped_listenable
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
