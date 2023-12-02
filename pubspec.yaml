@@ -1,10 +1,10 @@
-name: scoped_model
-description: Provides Listenable model to descendant widgets.
-version: 0.0.2
+name: scoped_listenable
+description: Provides a Listenable to descendant widgets.
+version: 1.0.0
 homepage:
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.17.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

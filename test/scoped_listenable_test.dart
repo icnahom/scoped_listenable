@@ -1,47 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:scoped_listenable/scoped_listenable.dart';
 
 void main() {
-  testWidgets('Provides a Listenable model to decendant widgets',
-      (tester) async {
+  testWidgets('Provides a Listenable to decendant widgets', (tester) async {
     final counterModel = CounterModel();
     await tester.pumpWidget(
-      ScopedModel(
-        model: counterModel,
+      ScopedListenable(
+        listenable: counterModel,
         child: const Placeholder(),
       ),
     );
-    expect(find.byType(ScopedModel<CounterModel>), findsOneWidget);
+    expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
   });
 
-  testWidgets('Provides all the ScopedModels to decendant widgets',
+  testWidgets('Provides all the ScopedListenables to decendant widgets',
       (tester) async {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
       ScopedContainer(
         container: [
-          ScopedModel.from(counterModel),
-          ScopedModel.from(settingsModel),
+          ScopedListenable.from(counterModel),
+          ScopedListenable.from(settingsModel),
         ],
         child: const Placeholder(),
       ),
     );
-    expect(find.byType(ScopedModel<CounterModel>), findsOneWidget);
-    expect(find.byType(ScopedModel<SettingsModel>), findsOneWidget);
+    expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
+    expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
   });
 
-  testWidgets('Builds itself whenever Listenable of type T changes',
+  testWidgets('Rebuilds itself whenever Listenable of type T changes',
       (tester) async {
     final counterModel = CounterModel();
     await tester.pumpWidget(
-      ScopedModel(
-        model: counterModel,
+      ScopedListenable(
+        listenable: counterModel,
         child: MaterialApp(
           home: ScopedBuilder<CounterModel>(
-            builder: (context, model, child) {
-              return Text('${model.counter}');
+            builder: (context, listenable, child) {
+              return Text('${listenable.counter}');
             },
           ),
         ),

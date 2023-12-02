@@ -11,28 +11,17 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
 
-Provides Listenable model to descendant widgets.
-
 ## Getting started
 
-Add `scoped_model` as a [dependency](https://dart.dev/tools/pub/dependencies#git-packages). 
-```yaml
-scoped_model:
-  git: https://github.com/icnahom/scoped_model.git
-```
-
-Import package: 
-```dart 
-import 'package:scoped_model/scoped_model.dart'; 
-```
+Add `scoped_listenable` as a dependency in your `pubspec.yaml` file.
 
 ## Usage
 
-Provide a Listenable model to descendant widgets. 
+Provide a Listenable to descendant widgets. 
 
 ```dart
-ScopedModel(
-  model: counterModel,
+ScopedListenable(
+  listenable: counterModel,
   child: MyApp(),
 );
 ```
@@ -41,21 +30,21 @@ Observe changes in the Listenable provided by an ancestor widget.
 
 ```dart
 ScopedBuilder<CounterModel>(
-  builder: (context, model, child) {
-    return Text('${model.counter}');
+  builder: (context, listenable, child) {
+    return Text('${listenable.counter}');
   },
 );
 ```
 
 ### Advanced
 
-To add multiple ScopedModels, use ScopedContainer. 
+To add multiple ScopedListenables, use ScopedContainer. 
 
 ```dart
 ScopedContainer(
   container: [
-    ScopedModel.from(counterModel),
-    ScopedModel.from(settingsModel),
+    ScopedListenable.from(counterModel),
+    ScopedListenable.from(settingsModel),
   ],
   child: MyApp(),
 );
@@ -65,15 +54,15 @@ To obtain Listenable directly, use extension methods.
 
 ```dart
 void initState() {
-  context.find<CounterModel>().reset();
+  context.get<CounterModel>().reset();
 ```
 ```dart
 Widget build(BuildContext context) {
-  final counterModel = context.dependOn<CounterModel>();
+  final counterModel = context.watch<CounterModel>();
 ```
 
 ## Additional information
 
-This is a ported and maintained version of [scoped_model](https://github.com/brianegan/scoped_model). 
+This is an updated version of [scoped_model](https://github.com/brianegan/scoped_model). 
 
-> All credits goes to the original authors and maintainers of the package.
+> Credits to the original authors and maintainers of the package.
