@@ -63,6 +63,4 @@ Widget build(BuildContext context) {
 
 ## Additional information
 
-This is an updated version of [scoped_model](https://github.com/brianegan/scoped_model). 
-
-> Credits to the original authors and maintainers of the package.
+This is an updated version of [scoped_model](https://github.com/brianegan/scoped_model). Credits to the original authors and maintainers.

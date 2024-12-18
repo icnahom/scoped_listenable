@@ -10,15 +10,14 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
 
   /// Returns a [Listenable], or throws an error.
   static T of<T extends Listenable>(BuildContext context,
-      {bool rebuildOnChange = true}) {
-    final scopedListenable = rebuildOnChange
+      {bool listen = true}) {
+    final scopedListenable = listen
         ? context.dependOnInheritedWidgetOfExactType<ScopedListenable<T>>()
         : context
             .getElementForInheritedWidgetOfExactType<ScopedListenable<T>>()
             ?.widget as ScopedListenable<T>?;
-    if (scopedListenable == null) {
-      throw ScopedError<T>();
-    }
+
+    if (scopedListenable == null) throw ScopedListenableNotFoundError();
     return scopedListenable.notifier!;
   }
 
@@ -63,37 +62,28 @@ class ScopedContainer extends StatelessWidget {
   }
 }
 
-/// Closure that creates and returns a [ScopedListenable] widget.
+/// Lexical closure that creates and returns a [ScopedListenable] widget.
 typedef ScopedListenableFactory = Widget Function(
     BuildContext context, Widget child);
 
 /// Methods for calling [ScopedListenable.of] on [BuildContext].
 extension ScopedContext on BuildContext {
   /// Returns a [Listenable] without rebuilding on change.
-  T get<T extends Listenable>() {
-    return ScopedListenable.of<T>(this, rebuildOnChange: false);
-  }
+  T get<T extends Listenable>() => ScopedListenable.of<T>(this, listen: false);
 
   /// Returns a [Listenable] and rebuilds on change.
-  T watch<T extends Listenable>() {
-    return ScopedListenable.of<T>(this);
-  }
+  T watch<T extends Listenable>() => ScopedListenable.of<T>(this);
 }
 
 /// Error thrown whenever a [ScopedListenable] is not found.
-class ScopedError<T> extends Error {
+class ScopedListenableNotFoundError<T> extends Error {
   @override
   String toString() {
     return '''
-      Error: Could not find ScopedListenable<$T>.
-      
-      To fix, please:
-                
-        * Provide type to ScopedBuilder<MyListenable> 
-        * Provide ScopedListenable<MyListenable> above MaterialApp or Navigator         
-        
-      If none of these solutions work, please file a bug at:
-      https://github.com/icnahom/scoped_listenable/issues/new
-    ''';
+      Could not find ScopedListenable<$T> in the widget tree.
+
+      * Make sure you have wrapped your widget with a ScopedListenable<$T> or a ScopedContainer.
+      * If using a ScopedContainer, ensure the ScopedListenableFactory for type $T is included in the container list.
+      ''';
   }
 }
