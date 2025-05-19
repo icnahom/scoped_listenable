@@ -44,7 +44,8 @@ To add multiple ScopedListenables, use ScopedContainer.
 ScopedContainer(
   container: [
     ScopedListenable.from(counterModel),
-    ScopedListenable.from(settingsModel),
+    // Or
+    settingsModel.scoped(),
   ],
   child: MyApp(),
 );
