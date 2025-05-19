@@ -24,7 +24,7 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
   /// Returns a [ScopedListenableFactory] closure to be used in [ScopedContainer].
   static ScopedListenableFactory from<T extends Listenable>(T listenable,
       {Key? key}) {
-    return (BuildContext context, Widget child) {
+    return (Widget child) {
       return ScopedListenable<T>(
           key: key, listenable: listenable, child: child);
     };
@@ -55,7 +55,7 @@ class ScopedContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget currentChild = child;
     for (final scopedListenableFactory in container) {
-      currentChild = scopedListenableFactory(context, currentChild);
+      currentChild = scopedListenableFactory(currentChild);
       assert(currentChild is ScopedListenable);
     }
     return currentChild;
@@ -63,8 +63,7 @@ class ScopedContainer extends StatelessWidget {
 }
 
 /// Lexical closure that creates and returns a [ScopedListenable] widget.
-typedef ScopedListenableFactory = Widget Function(
-    BuildContext context, Widget child);
+typedef ScopedListenableFactory = Widget Function(Widget child);
 
 /// Methods for calling [ScopedListenable.of] on [BuildContext].
 extension ScopedContext on BuildContext {
@@ -73,6 +72,16 @@ extension ScopedContext on BuildContext {
 
   /// Returns a [Listenable] and rebuilds on change.
   T watch<T extends Listenable>() => ScopedListenable.of<T>(this);
+}
+
+extension ScopedExtension<T extends ChangeNotifier> on T {
+  ScopedListenableFactory scoped({Key? key}) {
+    return ScopedListenable.from<T>(this, key: key);
+  }
+
+  ScopedListenable<T> scope(Widget child) {
+    return ScopedListenable<T>(listenable: this, child: child);
+  }
 }
 
 /// Error thrown whenever a [ScopedListenable] is not found.

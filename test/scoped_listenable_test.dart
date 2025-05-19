@@ -31,6 +31,46 @@ void main() {
     expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
   });
 
+  testWidgets(
+      'Provides all the ScopedListenables to decendant widgets (scoped)',
+      (tester) async {
+    final counterModel = CounterModel();
+    final settingsModel = SettingsModel();
+    await tester.pumpWidget(
+      ScopedContainer(
+        container: [
+          counterModel.scoped(),
+          settingsModel.scoped(),
+        ],
+        child: const Placeholder(),
+      ),
+    );
+    expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
+    expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
+  });
+
+  testWidgets(
+      'Provides all the ScopedListenables to decendant widgets (scope))',
+      (tester) async {
+    final counterModel = CounterModel();
+    final settingsModel = SettingsModel();
+    await tester.pumpWidget(
+      ScopedContainer(
+        container: [
+          counterModel.scoped(),
+          (child) {
+            return Builder(builder: (context) {
+              return settingsModel.scope(child);
+            });
+          },
+        ],
+        child: const Placeholder(),
+      ),
+    );
+    expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
+    expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
+  });
+
   testWidgets('Rebuilds itself whenever Listenable of type T changes',
       (tester) async {
     final counterModel = CounterModel();
