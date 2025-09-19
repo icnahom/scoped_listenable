@@ -45,7 +45,14 @@ ScopedContainer(
   container: [
     ScopedListenable.from(counterModel),
     // Or
-    settingsModel.scoped(),
+    counterModel.scoped(),
+    // Or
+    ScopedListenable.builder((context, child) {
+      return ScopedListenable(
+        listenable: counterModel,
+        child: child,
+      );
+    }),
   ],
   child: MyApp(),
 );

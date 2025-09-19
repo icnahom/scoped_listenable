@@ -16,7 +16,7 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
     return scopedListenable.notifier!;
   }
 
-  /// Returns a [ScopedListenableFactory] closure to be used in [ScopedContainer].
+  /// Returns a [ScopedListenableFactory] lexical closure to be used in [ScopedContainer].
   static ScopedListenableFactory from<T extends Listenable>(T listenable, {Key? key}) {
     return (Widget child) {
       return ScopedListenable<T>(key: key, listenable: listenable, child: child);
@@ -58,7 +58,6 @@ class ScopedContainer extends StatelessWidget {
     Widget currentChild = child;
     for (final scopedListenableFactory in container) {
       currentChild = scopedListenableFactory(currentChild);
-      // assert(currentChild is ScopedListenable);
     }
     return currentChild;
   }
