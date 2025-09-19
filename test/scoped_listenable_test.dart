@@ -14,8 +14,7 @@ void main() {
     expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
   });
 
-  testWidgets('Provides all the ScopedListenables to decendant widgets',
-      (tester) async {
+  testWidgets('Provides all the ScopedListenables to decendant widgets', (tester) async {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
@@ -31,9 +30,7 @@ void main() {
     expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
   });
 
-  testWidgets(
-      'Provides all the ScopedListenables to decendant widgets (scoped)',
-      (tester) async {
+  testWidgets('Provides all the ScopedListenables to decendant widgets (scoped)', (tester) async {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
@@ -49,20 +46,24 @@ void main() {
     expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
   });
 
-  testWidgets(
-      'Provides all the ScopedListenables to decendant widgets (scope))',
-      (tester) async {
+  testWidgets('Provides all the ScopedListenables to decendant widgets (builder))', (tester) async {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
       ScopedContainer(
         container: [
-          counterModel.scoped(),
-          (child) {
-            return Builder(builder: (context) {
-              return settingsModel.scope(child);
-            });
-          },
+          ScopedListenable.builder((context, child) {
+            return ScopedListenable(
+              listenable: counterModel,
+              child: child,
+            );
+          }),
+          ScopedListenable.builder((context, child) {
+            return ScopedListenable(
+              listenable: settingsModel,
+              child: child,
+            );
+          }),
         ],
         child: const Placeholder(),
       ),
@@ -71,8 +72,7 @@ void main() {
     expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
   });
 
-  testWidgets('Rebuilds itself whenever Listenable of type T changes',
-      (tester) async {
+  testWidgets('Rebuilds itself whenever Listenable of type T changes', (tester) async {
     final counterModel = CounterModel();
     await tester.pumpWidget(
       ScopedListenable(

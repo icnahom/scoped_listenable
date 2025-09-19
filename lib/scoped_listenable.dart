@@ -4,29 +4,33 @@ import 'package:flutter/widgets.dart';
 
 /// Provides a [Listenable] to decendant widgets.
 class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
-  const ScopedListenable(
-      {super.key, required T? listenable, required super.child})
-      : super(notifier: listenable);
+  const ScopedListenable({super.key, required T? listenable, required super.child}) : super(notifier: listenable);
 
   /// Returns a [Listenable], or throws an error.
-  static T of<T extends Listenable>(BuildContext context,
-      {bool listen = true}) {
+  static T of<T extends Listenable>(BuildContext context, {bool listen = true}) {
     final scopedListenable = listen
         ? context.dependOnInheritedWidgetOfExactType<ScopedListenable<T>>()
-        : context
-            .getElementForInheritedWidgetOfExactType<ScopedListenable<T>>()
-            ?.widget as ScopedListenable<T>?;
+        : context.getElementForInheritedWidgetOfExactType<ScopedListenable<T>>()?.widget as ScopedListenable<T>?;
 
     if (scopedListenable == null) throw ScopedListenableNotFoundError();
     return scopedListenable.notifier!;
   }
 
   /// Returns a [ScopedListenableFactory] closure to be used in [ScopedContainer].
-  static ScopedListenableFactory from<T extends Listenable>(T listenable,
-      {Key? key}) {
+  static ScopedListenableFactory from<T extends Listenable>(T listenable, {Key? key}) {
     return (Widget child) {
-      return ScopedListenable<T>(
-          key: key, listenable: listenable, child: child);
+      return ScopedListenable<T>(key: key, listenable: listenable, child: child);
+    };
+  }
+
+  static ScopedListenableFactory builder<T extends Listenable>(
+      ScopedListenable<T> Function(BuildContext context, Widget child) builder) {
+    return (Widget child) {
+      return Builder(
+        builder: (context) {
+          return builder(context, child);
+        },
+      );
     };
   }
 }
@@ -34,8 +38,7 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
 /// Builds itself whenever [Listenable] of type [T] changes.
 class ScopedBuilder<T extends Listenable> extends StatelessWidget {
   const ScopedBuilder({super.key, required this.builder, this.child});
-  final Widget Function(BuildContext context, T listenable, Widget? child)
-      builder;
+  final Widget Function(BuildContext context, T listenable, Widget? child) builder;
   final Widget? child;
 
   @override
@@ -46,8 +49,7 @@ class ScopedBuilder<T extends Listenable> extends StatelessWidget {
 
 /// Provides all the [ScopedListenable]s to decendant widgets.
 class ScopedContainer extends StatelessWidget {
-  const ScopedContainer(
-      {super.key, required this.container, required this.child});
+  const ScopedContainer({super.key, required this.container, required this.child});
   final List<ScopedListenableFactory> container;
   final Widget child;
 
@@ -56,7 +58,7 @@ class ScopedContainer extends StatelessWidget {
     Widget currentChild = child;
     for (final scopedListenableFactory in container) {
       currentChild = scopedListenableFactory(currentChild);
-      assert(currentChild is ScopedListenable);
+      // assert(currentChild is ScopedListenable);
     }
     return currentChild;
   }
@@ -77,10 +79,6 @@ extension ScopedContext on BuildContext {
 extension ScopedExtension<T extends ChangeNotifier> on T {
   ScopedListenableFactory scoped({Key? key}) {
     return ScopedListenable.from<T>(this, key: key);
-  }
-
-  ScopedListenable<T> scope(Widget child) {
-    return ScopedListenable<T>(listenable: this, child: child);
   }
 }
 
