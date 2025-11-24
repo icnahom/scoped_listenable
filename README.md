@@ -62,7 +62,7 @@ To obtain Listenable directly, use extension methods.
 
 ```dart
 void initState() {
-  context.get<CounterModel>().reset();
+  context.read<CounterModel>().reset();
 ```
 ```dart
 Widget build(BuildContext context) {
