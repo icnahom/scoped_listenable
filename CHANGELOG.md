@@ -1,3 +1,7 @@
+## 1.4.1
+
+* Updated `README.md` to use `read` extension method.
+
 ## 1.4.0
 
 * **Breaking change:** Renamed `ScopedContext.get<T>` to `read<T>`.
