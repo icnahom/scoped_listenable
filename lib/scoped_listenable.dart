@@ -8,30 +8,22 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
 
   /// Returns a [Listenable], or throws an error.
   static T of<T extends Listenable>(BuildContext context, {bool listen = true}) {
-    final scopedListenable = listen
-        ? context.dependOnInheritedWidgetOfExactType<ScopedListenable<T>>()
-        : context.getElementForInheritedWidgetOfExactType<ScopedListenable<T>>()?.widget as ScopedListenable<T>?;
+    ScopedListenable<T>? widget = listen
+        ? context.dependOnInheritedWidgetOfExactType() //
+        : context.getInheritedWidgetOfExactType();
 
-    if (scopedListenable == null) throw ScopedListenableNotFoundError();
-    return scopedListenable.notifier!;
+    if (widget?.notifier case T notifier) return notifier;
+    throw ScopedListenableNotFoundError<T>();
   }
 
-  /// Returns a [ScopedListenableFactory] lexical closure to be used in [ScopedContainer].
-  static ScopedListenableFactory from<T extends Listenable>(T listenable, {Key? key}) {
-    return (Widget child) {
-      return ScopedListenable<T>(key: key, listenable: listenable, child: child);
-    };
+  /// Returns a [ScopedFactory] lexical closure to be used in [ScopedContainer].
+  static ScopedFactory from<T extends Listenable>(T listenable, {Key? key}) {
+    return (Widget child) => ScopedListenable<T>(key: key, listenable: listenable, child: child);
   }
 
-  static ScopedListenableFactory builder<T extends Listenable>(
+  static ScopedFactory builder<T extends Listenable>(
       ScopedListenable<T> Function(BuildContext context, Widget child) builder) {
-    return (Widget child) {
-      return Builder(
-        builder: (context) {
-          return builder(context, child);
-        },
-      );
-    };
+    return (Widget child) => Builder(builder: (context) => builder(context, child));
   }
 }
 
@@ -43,53 +35,48 @@ class ScopedBuilder<T extends Listenable> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return builder(context, ScopedListenable.of<T>(context), child);
+    return builder(context, context.watch<T>(), child);
   }
 }
 
 /// Provides all the [ScopedListenable]s to decendant widgets.
 class ScopedContainer extends StatelessWidget {
   const ScopedContainer({super.key, required this.container, required this.child});
-  final List<ScopedListenableFactory> container;
+  final List<ScopedFactory> container;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    Widget currentChild = child;
-    for (final scopedListenableFactory in container) {
-      currentChild = scopedListenableFactory(currentChild);
-    }
-    return currentChild;
+    return container.reversed.fold(child, (currentChild, scopedFactory) => scopedFactory(currentChild));
   }
 }
-
-/// Lexical closure that creates and returns a [ScopedListenable] widget.
-typedef ScopedListenableFactory = Widget Function(Widget child);
 
 /// Methods for calling [ScopedListenable.of] on [BuildContext].
 extension ScopedContext on BuildContext {
   /// Returns a [Listenable] without rebuilding on change.
-  T get<T extends Listenable>() => ScopedListenable.of<T>(this, listen: false);
+  T read<T extends Listenable>() => ScopedListenable.of<T>(this, listen: false);
 
   /// Returns a [Listenable] and rebuilds on change.
   T watch<T extends Listenable>() => ScopedListenable.of<T>(this);
 }
 
 extension ScopedExtension<T extends ChangeNotifier> on T {
-  ScopedListenableFactory scoped({Key? key}) {
-    return ScopedListenable.from<T>(this, key: key);
-  }
+  ScopedFactory scoped({Key? key}) => ScopedListenable.from<T>(this, key: key);
 }
+
+/// Lexical closure that creates and returns a [ScopedListenable] widget.
+typedef ScopedFactory = Widget Function(Widget child);
 
 /// Error thrown whenever a [ScopedListenable] is not found.
 class ScopedListenableNotFoundError<T> extends Error {
   @override
   String toString() {
     return '''
-      Could not find ScopedListenable<$T> in the widget tree.
+      Could not find a ScopedListenable<$T> in the widget tree.
 
-      * Make sure you have wrapped your widget with a ScopedListenable<$T> or a ScopedContainer.
-      * If using a ScopedContainer, ensure the ScopedListenableFactory for type $T is included in the container list.
+      To fix:
+      * Wrap your widget subtree with ScopedListenable<$T> or include it in a ScopedContainer.
+      * If navigating routes, ensure the ScopedListenable is above the shared Navigator.
       ''';
   }
 }
