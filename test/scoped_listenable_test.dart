@@ -18,8 +18,8 @@ void main() {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
-      ScopedContainer(
-        container: [
+      ScopedListenable.merge(
+        listenables: [
           ScopedListenable.from(counterModel),
           ScopedListenable.from(settingsModel),
         ],
@@ -34,36 +34,10 @@ void main() {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
     await tester.pumpWidget(
-      ScopedContainer(
-        container: [
+      ScopedListenable.merge(
+        listenables: [
           counterModel.scoped(),
           settingsModel.scoped(),
-        ],
-        child: const Placeholder(),
-      ),
-    );
-    expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
-    expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
-  });
-
-  testWidgets('Provides all the ScopedListenables to decendant widgets (builder))', (tester) async {
-    final counterModel = CounterModel();
-    final settingsModel = SettingsModel();
-    await tester.pumpWidget(
-      ScopedContainer(
-        container: [
-          ScopedListenable.builder((context, child) {
-            return ScopedListenable(
-              listenable: counterModel,
-              child: child,
-            );
-          }),
-          ScopedListenable.builder((context, child) {
-            return ScopedListenable(
-              listenable: settingsModel,
-              child: child,
-            );
-          }),
         ],
         child: const Placeholder(),
       ),

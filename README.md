@@ -38,21 +38,14 @@ ScopedBuilder<CounterModel>(
 
 ### Advanced
 
-To add multiple ScopedListenables, use ScopedContainer. 
+To add multiple ScopedListenables, use ScopedListenable.merge. 
 
 ```dart
-ScopedContainer(
-  container: [
+ScopedListenable.merge(
+  listenables: [
     ScopedListenable.from(counterModel),
     // Or
     counterModel.scoped(),
-    // Or
-    ScopedListenable.builder((context, child) {
-      return ScopedListenable(
-        listenable: counterModel,
-        child: child,
-      );
-    }),
   ],
   child: MyApp(),
 );

@@ -1,3 +1,10 @@
+## 2.0.0
+
+* **Breaking change:** Renamed `ScopedContainer` to `ScopedListenable.merge`.
+* **Breaking change:** Removed `ScopedListenable.builder`.
+* Updated error message for `ScopedListenableNotFoundError`.
+* Updated documentation and tests.
+
 ## 1.4.1
 
 * Updated `README.md` to use `read` extension method.

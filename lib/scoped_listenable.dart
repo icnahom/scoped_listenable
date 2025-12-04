@@ -16,15 +16,14 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
     throw ScopedListenableNotFoundError<T>();
   }
 
-  /// Returns a [ScopedFactory] lexical closure to be used in [ScopedContainer].
+  /// Returns a [ScopedFactory] lexical closure to be used in [ScopedListenable.merge].
   static ScopedFactory from<T extends Listenable>(T listenable, {Key? key}) {
     return (Widget child) => ScopedListenable<T>(key: key, listenable: listenable, child: child);
   }
 
-  static ScopedFactory builder<T extends Listenable>(
-      ScopedListenable<T> Function(BuildContext context, Widget child) builder) {
-    return (Widget child) => Builder(builder: (context) => builder(context, child));
-  }
+  /// Merges multiple [ScopedFactory] into a single widget tree.
+  static Widget merge({required List<ScopedFactory> listenables, required Widget child}) =>
+      listenables.reversed.fold(child, (currentChild, scopedFactory) => scopedFactory(currentChild));
 }
 
 /// Builds itself whenever [Listenable] of type [T] changes.
@@ -39,18 +38,6 @@ class ScopedBuilder<T extends Listenable> extends StatelessWidget {
   }
 }
 
-/// Provides all the [ScopedListenable]s to decendant widgets.
-class ScopedContainer extends StatelessWidget {
-  const ScopedContainer({super.key, required this.container, required this.child});
-  final List<ScopedFactory> container;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return container.reversed.fold(child, (currentChild, scopedFactory) => scopedFactory(currentChild));
-  }
-}
-
 /// Methods for calling [ScopedListenable.of] on [BuildContext].
 extension ScopedContext on BuildContext {
   /// Returns a [Listenable] without rebuilding on change.
@@ -60,6 +47,7 @@ extension ScopedContext on BuildContext {
   T watch<T extends Listenable>() => ScopedListenable.of<T>(this);
 }
 
+/// Methods for creating a [ScopedFactory] from a [ChangeNotifier].
 extension ScopedExtension<T extends ChangeNotifier> on T {
   ScopedFactory scoped({Key? key}) => ScopedListenable.from<T>(this, key: key);
 }
@@ -72,11 +60,11 @@ class ScopedListenableNotFoundError<T> extends Error {
   @override
   String toString() {
     return '''
-      Could not find a ScopedListenable<$T> in the widget tree.
+      Could not find a `ScopedListenable<$T>` in the widget tree.
 
       To fix:
-      * Wrap your widget subtree with ScopedListenable<$T> or include it in a ScopedContainer.
-      * If navigating routes, ensure the ScopedListenable is above the shared Navigator.
+      * Wrap your widget subtree with `ScopedListenable<$T>` or include it in a `ScopedListenable.merge`.
+      * If navigating routes, ensure the `ScopedListenable` is above the shared Navigator.
       ''';
   }
 }
