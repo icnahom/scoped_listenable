@@ -16,13 +16,8 @@ class ScopedListenable<T extends Listenable> extends InheritedNotifier<T> {
     throw ScopedListenableNotFoundError<T>();
   }
 
-  /// Returns a [ScopedFactory] lexical closure to be used in [ScopedListenable.merge].
-  static ScopedFactory from<T extends Listenable>(T listenable, {Key? key}) {
-    return (Widget child) => ScopedListenable<T>(key: key, listenable: listenable, child: child);
-  }
-
-  /// Merges multiple [ScopedFactory] into a single widget tree.
-  static Widget merge({required List<ScopedFactory> listenables, required Widget child}) =>
+  /// Merges multiple [ScopedListenableBuilder] into a single widget tree.
+  static Widget merge({required List<ScopedListenableBuilder> listenables, required Widget child}) =>
       listenables.reversed.fold(child, (currentChild, scopedFactory) => scopedFactory(currentChild));
 }
 
@@ -40,20 +35,21 @@ class ScopedBuilder<T extends Listenable> extends StatelessWidget {
 
 /// Methods for calling [ScopedListenable.of] on [BuildContext].
 extension ScopedContext on BuildContext {
-  /// Returns a [Listenable] without rebuilding on change.
-  T read<T extends Listenable>() => ScopedListenable.of<T>(this, listen: false);
-
   /// Returns a [Listenable] and rebuilds on change.
   T watch<T extends Listenable>() => ScopedListenable.of<T>(this);
+
+  /// Returns a [Listenable] without rebuilding on change.
+  T read<T extends Listenable>() => ScopedListenable.of<T>(this, listen: false);
 }
 
-/// Methods for creating a [ScopedFactory] from a [ChangeNotifier].
+/// Methods for creating a [ScopedListenableBuilder] from a [ChangeNotifier].
 extension ScopedExtension<T extends ChangeNotifier> on T {
-  ScopedFactory scoped({Key? key}) => ScopedListenable.from<T>(this, key: key);
+  ScopedListenableBuilder scoped({Key? key}) =>
+      (Widget child) => ScopedListenable<T>(key: key, listenable: this, child: child);
 }
 
 /// Lexical closure that creates and returns a [ScopedListenable] widget.
-typedef ScopedFactory = Widget Function(Widget child);
+typedef ScopedListenableBuilder = Widget Function(Widget child);
 
 /// Error thrown whenever a [ScopedListenable] is not found.
 class ScopedListenableNotFoundError<T> extends Error {

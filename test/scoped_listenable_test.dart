@@ -14,22 +14,6 @@ void main() {
     expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
   });
 
-  testWidgets('Provides all the ScopedListenables to decendant widgets', (tester) async {
-    final counterModel = CounterModel();
-    final settingsModel = SettingsModel();
-    await tester.pumpWidget(
-      ScopedListenable.merge(
-        listenables: [
-          ScopedListenable.from(counterModel),
-          ScopedListenable.from(settingsModel),
-        ],
-        child: const Placeholder(),
-      ),
-    );
-    expect(find.byType(ScopedListenable<CounterModel>), findsOneWidget);
-    expect(find.byType(ScopedListenable<SettingsModel>), findsOneWidget);
-  });
-
   testWidgets('Provides all the ScopedListenables to decendant widgets (scoped)', (tester) async {
     final counterModel = CounterModel();
     final settingsModel = SettingsModel();
@@ -54,6 +38,26 @@ void main() {
         child: MaterialApp(
           home: ScopedBuilder<CounterModel>(
             builder: (context, listenable, child) {
+              return Text('${listenable.counter}');
+            },
+          ),
+        ),
+      ),
+    );
+    expect(find.text('0'), findsOneWidget);
+    counterModel.increment();
+    await tester.pump();
+    expect(find.text('1'), findsOneWidget);
+  });
+  testWidgets('Rebuilds itself whenever Listenable of type T changes (context)', (tester) async {
+    final counterModel = CounterModel();
+    await tester.pumpWidget(
+      ScopedListenable(
+        listenable: counterModel,
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) {
+              final listenable = context.watch<CounterModel>();
               return Text('${listenable.counter}');
             },
           ),

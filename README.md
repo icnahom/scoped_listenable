@@ -43,9 +43,8 @@ To add multiple ScopedListenables, use ScopedListenable.merge.
 ```dart
 ScopedListenable.merge(
   listenables: [
-    ScopedListenable.from(counterModel),
-    // Or
     counterModel.scoped(),
+    settingsModel.scoped(),
   ],
   child: MyApp(),
 );
@@ -55,11 +54,11 @@ To obtain Listenable directly, use extension methods.
 
 ```dart
 void initState() {
-  context.read<CounterModel>().reset();
+  context.get<CounterModel>().reset();
 ```
 ```dart
 Widget build(BuildContext context) {
-  final counterModel = context.watch<CounterModel>();
+  final counterModel = context.dependOn<CounterModel>();
 ```
 
 ## Additional information
