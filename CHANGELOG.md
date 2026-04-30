@@ -1,3 +1,8 @@
+## 2.0.1 (2026-04-30)
+
+* Refactor: Renamed `ScopedFactory` to `ScopedListenableBuilder`.
+* Removed `ScopedListenable.from` method.
+
 ## 2.0.0
 
 * **Breaking change:** Renamed `ScopedContainer` to `ScopedListenable.merge`.
