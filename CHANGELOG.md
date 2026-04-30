@@ -1,3 +1,7 @@
+## 2.0.2
+
+* Updated documentation in README.md.
+
 ## 2.0.1 (2026-04-30)
 
 * Refactor: Renamed `ScopedFactory` to `ScopedListenableBuilder`.
